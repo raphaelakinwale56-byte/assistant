@@ -1,0 +1,495 @@
+:root {
+  --prudent-primary: #2563eb; /* Slightly deeper, more professional blue */
+  --prudent-primary-soft: #f0f7ff;
+  --prudent-bg: #ffffff;
+  --prudent-bg-alt: #f8fafc;
+  --prudent-text: #0f172a;
+  --prudent-text-muted: #64748b;
+  --prudent-white: #ffffff;
+  --prudent-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 10px -2px rgba(0, 0, 0, 0.03);
+  --prudent-shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
+  --prudent-radius: 32px;
+  --prudent-radius-sm: 16px;
+}
+
+#prudent-chat-widget {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.prudent-welcome-bubble {
+  position: absolute;
+  bottom: 85px;
+  right: 0;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 24px;
+  box-shadow: var(--prudent-shadow);
+  font-size: 14px;
+  width: 240px;
+  border: 1px solid rgba(0,0,0,0.04);
+  cursor: pointer;
+  animation: float 4s ease-in-out infinite;
+  display: none;
+  color: var(--prudent-text);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.prudent-welcome-bubble.active {
+  display: block;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.prudent-chat-button {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--prudent-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 12px 24px -6px rgba(37, 99, 235, 0.3);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.prudent-chat-button:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 20px 32px -8px rgba(37, 99, 235, 0.4);
+}
+
+.prudent-unread-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+}
+
+.prudent-unread-badge.active {
+  display: flex;
+}
+
+.prudent-resume-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 85px;
+  background: white;
+  color: var(--prudent-primary);
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--prudent-shadow);
+  display: none;
+  white-space: nowrap;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.prudent-resume-btn.active {
+  display: block;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.prudent-chat-window {
+  position: absolute;
+  bottom: 90px;
+  right: 0;
+  width: 420px;
+  height: 640px;
+  background: var(--prudent-white);
+  border-radius: var(--prudent-radius);
+  box-shadow: var(--prudent-shadow-lg);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.06);
+  animation: windowOpen 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(20px);
+}
+
+@keyframes windowOpen {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.prudent-chat-window.active {
+  display: flex;
+}
+
+.prudent-chat-header {
+  background: white;
+  color: var(--prudent-text);
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.prudent-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.prudent-go-main {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--prudent-primary);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: var(--prudent-primary-soft);
+  transition: all 0.2s;
+}
+
+.prudent-go-main:hover {
+  background: var(--prudent-primary);
+  color: white;
+}
+
+.prudent-chat-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prudent-status-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prudent-status-dot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  position: relative;
+}
+
+.prudent-status-dot::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  border-radius: inherit;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.prudent-status-text {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prudent-chat-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--prudent-text);
+  letter-spacing: -0.02em;
+}
+
+.prudent-chat-close {
+  cursor: pointer;
+  color: var(--prudent-text-muted);
+  transition: color 0.2s;
+  padding: 4px;
+}
+
+.prudent-chat-close:hover {
+  color: var(--prudent-text);
+}
+
+.prudent-chat-messages {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--prudent-bg-alt);
+  scrollbar-width: none;
+}
+
+.prudent-chat-messages::-webkit-scrollbar {
+  display: none;
+}
+
+.prudent-message {
+  max-width: 85%;
+  padding: 16px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.prudent-message.bot {
+  background: white;
+  color: var(--prudent-text);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.prudent-message.user {
+  background: var(--prudent-primary);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.prudent-message.system {
+  background: transparent;
+  color: var(--prudent-text-muted);
+  align-self: center;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.prudent-chat-quick-replies {
+  padding: 16px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--prudent-bg);
+}
+
+.prudent-quick-reply {
+  background: white;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  color: var(--prudent-primary);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.prudent-quick-reply:hover {
+  background: var(--prudent-primary-soft);
+  border-color: var(--prudent-primary);
+  transform: translateY(-1px);
+}
+
+.prudent-chat-input-area {
+  padding: 24px 32px;
+  display: flex;
+  gap: 16px;
+  background: white;
+  align-items: center;
+  border-top: 1px solid rgba(0,0,0,0.04);
+}
+
+.prudent-chat-input {
+  flex: 1;
+  border: none;
+  background: var(--prudent-bg);
+  border-radius: 16px;
+  padding: 12px 20px;
+  font-size: 14px;
+  outline: none;
+  color: var(--prudent-text);
+  transition: all 0.2s;
+}
+
+.prudent-chat-input::placeholder {
+  color: var(--prudent-text-muted);
+}
+
+.prudent-chat-input:focus {
+  background: white;
+  box-shadow: inset 0 0 0 2px var(--prudent-primary-soft);
+}
+
+.prudent-chat-send {
+  background: var(--prudent-primary);
+  color: white;
+  border: none;
+  border-radius: 18px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.prudent-chat-send:hover {
+  transform: scale(1.1);
+  background: #1d4ed8;
+}
+
+/* Registration Form Styles - Minimalist */
+.prudent-registration-form {
+  padding: 0;
+  background: transparent;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.prudent-registration-form h4 {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--prudent-text);
+}
+
+.prudent-form-group {
+  margin-bottom: 16px;
+}
+
+.prudent-form-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--prudent-text-muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.prudent-registration-form input, 
+.prudent-registration-form select, 
+.prudent-registration-form textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.prudent-registration-form input:focus, 
+.prudent-registration-form select:focus, 
+.prudent-registration-form textarea:focus {
+  border-color: var(--prudent-primary);
+}
+
+.prudent-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.prudent-btn-primary {
+  flex: 1;
+  background: var(--prudent-primary);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.prudent-btn-primary:hover {
+  background: #2563eb;
+}
+
+.prudent-btn-secondary {
+  flex: 1;
+  background: var(--prudent-bg);
+  color: var(--prudent-text-muted);
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.prudent-btn-secondary:hover {
+  background: #e2e8f0;
+  color: var(--prudent-text);
+}
+
+.prudent-typing {
+  font-size: 12px;
+  color: var(--prudent-text-muted);
+  padding: 0 24px 12px;
+  display: none;
+  font-style: italic;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.prudent-typing.active {
+  display: block;
+}
+
+@media (max-width: 480px) {
+  #prudent-chat-widget {
+    bottom: 20px;
+    right: 20px;
+  }
+  .prudent-chat-window {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 100px);
+    bottom: 80px;
+    border-radius: 20px;
+  }
+  .prudent-resume-btn {
+    bottom: 80px;
+    right: 0;
+    width: calc(100vw - 40px);
+    text-align: center;
+  }
+}
