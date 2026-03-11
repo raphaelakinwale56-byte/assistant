@@ -37,103 +37,112 @@ async function startServer() {
   }
 
   // API Routes
-  app.post("/api/leads", (req, res) => {
-    const { name, phone, email, message, type } = req.body;
-    try {
-      const stmt = db.prepare("INSERT INTO leads (name, phone, email, message) VALUES (?, ?, ?, ?)");
-      stmt.run(name, phone, email, message);
-      
-      // Log for "auto-response" simulation
-      console.log(`Auto-response email triggered for ${email}`);
-      
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Lead capture error:", error);
-      res.status(500).json({ error: "Failed to save lead" });
-    }
-  });
+ // =========================
+// API ROUTES
+// =========================
 
-  app.post("/api/assessment", (req, res) => {
-    const { patientName, contactName, phone, urgency, careType, details } = req.body;
-    try {
-      const message = `SMART ASSESSMENT: Urgency: ${urgency}. Care Type: ${careType}. Details: ${details}. Contact: ${contactName}`;
-      const stmt = db.prepare("INSERT INTO leads (name, phone, email, message) VALUES (?, ?, ?, ?)");
-      stmt.run(patientName, phone, "assessment@prudent.com", message);
-      res.json({ success: true, message: "Assessment submitted successfully" });
-    } catch (error) {
-      console.error("Assessment error:", error);
-      res.status(500).json({ error: "Failed to save assessment" });
-    }
-  });
+// Lead capture
+app.post("/api/leads", (req, res) => {
+  const { name, phone, email, message } = req.body;
 
-  app.get("/api/faq", (req, res) => {
-    const faqs = [
-      {
-        question: "What areas do you serve?",
-        answer: "We proudly serve Bismarck, Mandan, and Lincoln, North Dakota."
-      },
-      {
-        question: "Do you provide 24/7 care?",
-        answer: "Yes, we offer flexible scheduling including 24/7 care, overnight stays, and hourly assistance tailored to your needs."
-      },
-      {
-        question: "How do I know if I'm eligible for homecare?",
-        answer: "Eligibility depends on individual needs. We offer a free home assessment to help determine the best care plan for you or your loved one."
-      },
-      {
-        question: "Are your caregivers trained?",
-        answer: "Absolutely. Our caregivers are trained professionals who are kind, patient, and genuinely dedicated to providing high-quality care."
-      }
-    ];
-    res.json(faqs);
-  });
+  try {
+    const stmt = db.prepare(
+      "INSERT INTO leads (name, phone, email, message) VALUES (?, ?, ?, ?)"
+    );
 
-  // Serve static widget files
-  app.use("/widget", express.static(path.join(__dirname, "public")));
+    stmt.run(name, phone, email, message);
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
+    console.log(`Auto-response email triggered for ${email}`);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Lead capture error:", error);
+    res.status(500).json({ error: "Failed to save lead" });
+  }
+});
+
+
+// Smart assessment
+app.post("/api/assessment", (req, res) => {
+  const { patientName, contactName, phone, urgency, careType, details } =
+    req.body;
+
+  try {
+    const message = `SMART ASSESSMENT: Urgency: ${urgency}. Care Type: ${careType}. Details: ${details}. Contact: ${contactName}`;
+
+    const stmt = db.prepare(
+      "INSERT INTO leads (name, phone, email, message) VALUES (?, ?, ?, ?)"
+    );
+
+    stmt.run(patientName, phone, "assessment@prudent.com", message);
+
+    res.json({
+      success: true,
+      message: "Assessment submitted successfully",
     });
-    app.use(vite.middlewares);
-  } else {
-    app.use(express.static(path.join(__dirname, "dist")));
-    app.get("*", (req, res) => {
-      app.post("/api/chat", async (req, res) => {
+  } catch (error) {
+    console.error("Assessment error:", error);
+    res.status(500).json({ error: "Failed to save assessment" });
+  }
+});
+
+
+// FAQ API
+app.get("/api/faq", (req, res) => {
+  const faqs = [
+    {
+      question: "What areas do you serve?",
+      answer:
+        "We proudly serve Bismarck, Mandan, and Lincoln, North Dakota.",
+    },
+    {
+      question: "Do you provide 24/7 care?",
+      answer:
+        "Yes, we offer flexible scheduling including 24/7 care, overnight stays, and hourly assistance tailored to your needs.",
+    },
+    {
+      question: "How do I know if I'm eligible for homecare?",
+      answer:
+        "Eligibility depends on individual needs. We offer a free home assessment to help determine the best care plan.",
+    },
+    {
+      question: "Are your caregivers trained?",
+      answer:
+        "Absolutely. Our caregivers are trained professionals who are kind, patient, and dedicated to providing high-quality care.",
+    },
+  ];
+
+  res.json(faqs);
+});
+
+
+// AI CHAT API
+app.post("/api/chat", async (req, res) => {
   try {
     const { message, history } = req.body;
 
     const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY
+      apiKey: process.env.GEMINI_API_KEY,
     });
 
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
       contents: [
         ...(history || []),
-        { role: "user", parts: [{ text: message }] }
-      ]
+        {
+          role: "user",
+          parts: [{ text: message }],
+        },
+      ],
     });
 
-    const text =
-      response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const reply =
+      response.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Sorry, I couldn't generate a response.";
 
-    res.json({ reply: text });
-
+    res.json({ reply });
   } catch (error) {
     console.error("Chat API error:", error);
     res.status(500).json({ error: "Chat failed" });
   }
 });
-      res.sendFile(path.join(__dirname, "dist", "index.html"));
-    });
-  }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
-
-startServer();
