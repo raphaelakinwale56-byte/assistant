@@ -101,6 +101,32 @@ async function startServer() {
   } else {
     app.use(express.static(path.join(__dirname, "dist")));
     app.get("*", (req, res) => {
+      app.post("/api/chat", async (req, res) => {
+  try {
+    const { message, history } = req.body;
+
+    const ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY
+    });
+
+    const response = await ai.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: [
+        ...(history || []),
+        { role: "user", parts: [{ text: message }] }
+      ]
+    });
+
+    const text =
+      response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    res.json({ reply: text });
+
+  } catch (error) {
+    console.error("Chat API error:", error);
+    res.status(500).json({ error: "Chat failed" });
+  }
+});
       res.sendFile(path.join(__dirname, "dist", "index.html"));
     });
   }
