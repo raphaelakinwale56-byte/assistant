@@ -122,25 +122,46 @@ app.post("/api/chat", async (req, res) => {
     const { message, history } = req.body;
 
     const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
+      apiKey: process.env.GEMINI_API_KEY
     });
+
+    const systemPrompt = `
+You are the AI assistant for Prudent Homecare.
+
+Your job is to help families understand and arrange homecare services.
+
+Business Information:
+- Company: Prudent Homecare
+- Location: Bismarck, Mandan, and Lincoln, North Dakota
+- Services: Personal Care, Companionship, Medication Support, Transportation, Agency Foster Home
+- Care options include hourly care, overnight care, and 24/7 care.
+
+Rules:
+- Always be warm, calm, and professional.
+- Focus only on homecare, caregiving, and services offered.
+- If someone asks unrelated questions, gently redirect to care services.
+- Encourage users to request a care assessment when appropriate.
+- Never make up medical advice.
+- Speak clearly and simply.
+
+Goal:
+Help families understand care options and guide them toward scheduling an assessment.
+`;
 
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
       contents: [
+        { role: "user", parts: [{ text: systemPrompt }] },
         ...(history || []),
-        {
-          role: "user",
-          parts: [{ text: message }],
-        },
-      ],
+        { role: "user", parts: [{ text: message }] }
+      ]
     });
 
-    const reply =
-      response.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Sorry, I couldn't generate a response.";
+    const text =
+      response.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    res.json({ reply });
+    res.json({ reply: text });
+
   } catch (error) {
     console.error("Chat API error:", error);
     res.status(500).json({ error: "Chat failed" });
