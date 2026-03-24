@@ -13,7 +13,7 @@ if (!message || typeof message !== "string") {
 }
 
 // ✅ Block sensitive data in chat
-const sensitivePatterns = /phone|email|address|ssn|credit card|bank|medical|diagnosis|treatment/i;
+const sensitivePatterns = /(\b\d{7,}\b)|phone|email|address|ssn|credit card|bank|medical|diagnosis|treatment|@/i;
 
 if (sensitivePatterns.test(message)) {
   return res.json({
