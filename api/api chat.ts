@@ -23,14 +23,25 @@ if (sensitivePatterns.test(message)) {
 
     const ai = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY,
+      const SYSTEM_PROMPT = `
+You are a professional homecare assistant.
+
+RULES:
+- Do NOT ask for personal or sensitive information
+- Do NOT provide medical advice, diagnosis, or treatment
+- Keep responses general and helpful
+- If user needs personal care, direct them to the Smart Assessment form
+`;
     });
 
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
-      contents: [
-        ...(history || []),
-        { role: "user", parts: [{ text: message }] },
-      ],
+     contents: [
+  {
+    role: "user",
+    parts: [{ text: SYSTEM_PROMPT + "\n\nUser: " + message }],
+  },
+],
     });
 
     const text =
