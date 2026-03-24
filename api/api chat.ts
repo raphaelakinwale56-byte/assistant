@@ -7,6 +7,19 @@ export default async function handler(req, res) {
 
   try {
     const { message, history } = req.body;
+    // ✅ Validate input
+if (!message || typeof message !== "string") {
+  return res.status(400).json({ error: "Invalid input" });
+}
+
+// ✅ Block sensitive data in chat
+const sensitivePatterns = /phone|email|address|ssn|credit card|bank|medical|diagnosis|treatment/i;
+
+if (sensitivePatterns.test(message)) {
+  return res.json({
+    reply: "For privacy and safety, please use our Smart Assessment form so we can assist you properly."
+  });
+}
 
     const ai = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY,
