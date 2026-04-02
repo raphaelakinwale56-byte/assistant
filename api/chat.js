@@ -13,8 +13,24 @@ RULES:
 - Guide users toward Smart Assessment or speaking to a coordinator
 - Be warm, human, and professional (not robotic)
 
+WEBSITE INTELLIGENCE:
+- Use the provided website data to answer questions accurately
+- Do NOT make up services outside of the provided data
+- If unsure, give a general answer and guide the user to the next step
+
 GOAL:
 Help users understand care options and take the next step safely.
+`;
+
+// 🌐 STEP 1: WEBSITE CONTEXT (EDIT THIS WITH YOUR REAL CONTENT)
+const WEBSITE_CONTEXT = `
+Prudent Homecare provides:
+- Personal care services
+- Companion care
+- Daily living assistance
+- Support for seniors and families
+
+Users can complete a Smart Assessment form to receive personalized care.
 `;
 
 export default async function handler(req, res) {
@@ -23,7 +39,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // 🔒 Restrict origin (replace with your real domain)
+  // 🔒 Restrict origin
   const allowedOrigin = "https://assistant-delta-two.vercel.app";
   if (req.headers.origin && req.headers.origin !== allowedOrigin) {
     return res.status(403).json({ error: "Forbidden" });
@@ -41,7 +57,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Message too long" });
     }
 
-    // 🔒 Rate limiting (10 requests per minute per IP)
+    // 🔒 Rate limiting (10 requests/min per IP)
     const ip =
       req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
@@ -80,7 +96,7 @@ export default async function handler(req, res) {
       apiKey: process.env.GEMINI_API_KEY,
     });
 
-    // 🤖 Generate response
+    // 🤖 STEP 2: INJECT WEBSITE CONTEXT INTO AI
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
       contents: [
@@ -88,7 +104,14 @@ export default async function handler(req, res) {
           role: "user",
           parts: [
             {
-              text: `${SYSTEM_PROMPT}\n\nUser: ${message}`,
+              text: `
+${SYSTEM_PROMPT}
+
+WEBSITE DATA:
+${WEBSITE_CONTEXT}
+
+User: ${message}
+              `,
             },
           ],
         },
